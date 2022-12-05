@@ -47,5 +47,38 @@ do
 		 sed "s|${pop[i]}_AF=||g" |awk '$4 !=0 {print}' > "${pop[i]}"_sub_SharedPositions_AF &&
 			sed 's/ /\t/g' "${pop[i]}"_sub_SharedPositions_AF|cut -f 1,2,3| sed 's/\t/_/g' > "${pop[i]}"_sub_SharedPositions;
 done
+
+$ bash script
 ```
 _"pop" is a list that contains names of the subpopulations [EAS,AMR,AFR,EUR,SAS] each in a line. While "colnum" is another list with the same length that contains the column numbers where each subpopulation's AF exists [13,14,15,16,17] repectively._
+
+**8- creation of the the EGYREF AF list**
+```
+awk 'BEGIN{FS=OFS="\t"} NR==FNR{a[$1,$2]=$3;next} ($1,$2) in a{print $1,$2,$5,$9,$3, a[$1,$2]}' EGYREF_1000g_all_chr_positions EGYREF_all_tab > EGYREF_SharedPositions_AF && cut -f 1,2,3 EGYREF_SharedPositions_AF| sed 's/\t/_/g' > EGYREF_SharedPositions
+```
+# Populations genotype principal component analysis (PCA) extraction
+
+```
+$ mkdir plink && cd plink
+```
+**1- Merging all the samples in one BCF file with unified annotation**
+```
+$ bcftools merge -0 -m all -o genes_all.vcf.gz -O z ../genes_1000_DEDUP_biallelic.vcf.gz genes_EGYREF_DEDUP_biallelic.vcf.gz
+$ bcftools norm -m-any genes_all.vcf.gz | bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' > genes_all.bcf; bcftools index genes_all.bcf
+```
+**2- making the bed file required for the plink**
+
+_Here we're using plink v2_
+```
+$ plink2 --bcf genes_all.bcf --vcf-idspace-to _ --const-fid --allow-extra-chr 0  --make-bed --out genes_all --vcf-half-call r
+```
+**3- Variants Pruning with MAF=0.05 and indep-pairwise 50 5 0.5 and exclusion of the pruned varianted**
+```
+$ mkdir pruned && cd pruned
+$ plink2 --bfile ../genes_all --maf 0.05 --indep-pairwise 50 5 0.5 --out genes_all; plink2 --bfile ../genes_all --extract pruned/genes_all.prune.in --make-bed --out pruned/genes_all
+```
+**4- extraction of the eigen values and eigen vectors of the PCA**
+```
+plink2 --bfile genes_all --pca
+```
+# R analysis and visualization
