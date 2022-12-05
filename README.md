@@ -159,6 +159,8 @@ fig
 ```
 **3- Genotype PCA Visualization**
 
+_** samples_names were extracted from the merged file and then joined with the meta data file downloaded from the 1000g website (Auton et al., 2015)to annotate the 1000g samples, while the rest 110 samples were the Egyptian samples obtained from  (Wohlers et al., 2020)._
+
 ```
 #Loading needed libraries 
 library(plotly)
@@ -200,14 +202,13 @@ names(eigenvectors)[3] <- "PC3"
 tit = 'PCA genotypes'
 axx <- list(title="PC1 (41.11 %)")
 axy <- list(title="PC2 (20.34 %)")
-axz <- list(title="PC3 (7.72 %)" )
 
-fig <- plot_ly(eigenvectors,z= ~PC1,y= ~PC2 ,x=~PC3,color = samples$V2, colors = brewer.pal(n = 8, name = "Set1")) %>%
+fig <- plot_ly(eigenvectors,x= ~PC1,y= ~PC2 ,color = samples$V2, colors = brewer.pal(n = 8, name = "Set1")) %>%
   add_markers(size = 20)
 fig <- fig %>%
   layout(
     title = tit,
-    scene = list(bgcolor = "white",xaxis=axz,yaxis=axy,zaxis=axx)
+    scene = list(bgcolor = "white",xaxis=axx,yaxis=axy)
   )
 
 fig
