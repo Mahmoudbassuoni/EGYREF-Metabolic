@@ -82,3 +82,78 @@ $ plink2 --bfile ../genes_all --maf 0.05 --indep-pairwise 50 5 0.5 --out genes_a
 plink2 --bfile genes_all --pca
 ```
 # R analysis and visualization
+**1- Subpopulation lists intersection with the Egyptian list**
+_UpSetR package was used to draw the intersection of the six populations’ lists_
+```
+library(UpSetR)
+x <- list('AFR'=AFR_sub_SharedPositions$V1, 'EGYREF'=EGYREF_SharedPositions$V1, 
+      'AMR'= AMR_sub_SharedPositions$V1,'EUR'= EUR_sub_SharedPositions$V1,
+      'EAS'=EAS_sub_SharedPositions$V1,
+      'SAS' = SAS_sub_SharedPositions$V1 )
+
+upset(fromList(x),sets = c("EGYREF","AFR","AMR","EAS","EUR","SAS"),sets.x.label="Sets Size",
+      show.numbers = "yes",line.size = 0.5,set_size.numbers_size=10,set_size.scale_max= 70000
+      ,order.by = "freq",matrix.color = "gray32",main.bar.color = "brown",
+      set_size.show=TRUE,sets.bar.color="blue4",point.size = 2,text.scale=c(1.3, 1.4, 1.3, 1, 1.3, 1.1))
+```
+**2- Allele Frequencies heatmap and PCA Visualization**
+
+_(1) Join function in R “plyr” package was used on the 1000 and the Egyptian genome files
+based on the chromosome, position, and alternative allele columns_
+```
+library(plyr)
+joined <- join(x= all_tab_1000,y = all_tab_Egyref, by= c("V1"="V1","V2"="V2","V5"="V5"),type ="full",match="all")
+write.csv(joined,"~/EgyRef/2022.metabolic_elhadidi/analysis/joined")
+```
+_(2) AFs [joined] is pruned for a heatmap to be drawn based on the existence of a value for that
+variant in the Egyptian population ensuring avoidance of dropping any Egyptian
+variant_ 
+
+```
+$ cd ~/EgyRef/2022.metabolic_elhadidi/analysis
+$ sed 's/NA/0/g' joined| awk 'BEGIN{OFS="\t"} $24 !=0 {print}' | cut -f 2,3,6,14-18,24 | sed 's/EAS_AF=//g'| sed 's/AMR_AF=//g'|sed 's/EUR_AF=//g' | sed 's/AFR_AF=//g'| sed 's/SAS_AF=//g'|sed 's/AF=//g'> joined_full
+```
+_(3) heatmap Visualization_
+```
+All_var <- joined_full[,-3][,-2][,-1]
+matrix <- as.matrix(All_var)
+pheatmap::pheatmap(mat = matrix,scale = "column", cellheight = 0.02, cellwidth = 60 ,main = "Positions Allele Frequency" )
+```
+_(4) calculation and visualization the AFs' PCA_
+
+```
+#Load needed libraries 
+library(plotly)
+library("RColorBrewer")
+#Load the main file AF
+joined_full <- data.frame(read.table("~/EgyRef/2022.metabolic_elhadidi/analysis/joined_full"
+                      , header=FALSE, skip=0,))
+#Convert the data frame to a matrix and clean the first 3 columns to retain only numbers  
+pop_mat <- as.matrix(joined_full[,-3][,-2][,-1])
+#Transpose the matrix
+pop_mat_t <- t(pop_mat)
+#extract populations' names and set the populations' names as to be used as metadata 
+x <- colnames(pop_mat)
+pop<- data.frame(x)
+#Calculate the PCA
+PCA <- prcomp(pop_mat_t,rank. = 3)
+#check the Cumlative proportions for each PC
+summary(PCA)
+#extract the PCA components
+components <- PCA[['x']]
+components <- data.frame(components)
+
+#Plotting the PCA in 2D brewer.pal(n = 8, name = "Set1")
+tit = 'PCA Populations total variations'
+fig <- plot_ly(components, x=components$PC1,y=components$PC2, color = pop$x, colors = rainbow(8) , name = pop$x) %>%
+    add_markers(size = 20)
+fig <- fig %>%
+  layout(
+    title = tit,
+    xaxis=list( title="PC 1"),
+    yaxis=list(title= "PC 2"),
+    scene = list(bgcolor = "#e5ecf6")
+  )
+
+fig
+```
