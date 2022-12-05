@@ -157,3 +157,58 @@ fig <- fig %>%
 
 fig
 ```
+**3- Genotype PCA Visualization**
+
+```
+#Loading needed libraries 
+library(plotly)
+library(plyr)
+library(readxl)
+library(RColorBrewer)
+#Loading the EigenValues and EigenVectors
+eigenvectors <- data.frame(read.table("~/EgyRef/2022.metabolic_elhadidi/analysis/plink/pruned/plink2.eigenvec"
+                               , header=FALSE, skip=0,))
+eigenvalues <- data.frame(read.table("~/EgyRef/2022.metabolic_elhadidi/analysis/plink/pruned/plink2.eigenval"
+                                     , header=FALSE, skip=0,))
+#Data_Cleaning 
+rownames(eigenvectors) <- eigenvectors[,2]
+eigenvectors <- eigenvectors[,3:ncol(eigenvectors)]
+#Check Summary 
+summary(eigenvectors)
+#Getting the Proportion of Variances in different PCs
+proportionvariances <- data.frame(PC = 1:10, proportionvariances = eigenvalues/sum(eigenvalues)*100)
+#Visualization of the proportions of variances
+a <- ggplot(proportionvariances,aes(x = PC,y=V1))+ geom_bar(stat = "identity")
+a + ylab("Percentage variance explained") + theme_light()
+# calculate the cumulative sum of the percentage variance explained 
+cumsum(proportionvariances$V1)
+#2D Basic plot 
+plot(eigenvectors[,1], eigenvectors[,2])
+#Loading the samples metadata (populations)
+samples <- data.frame(read.table("~/EgyRef/2022.metabolic_elhadidi/analysis/plink/samples_pop_meta.csv"
+                                 , header=FALSE, skip=0,sep = "\t"))
+samples_names <- data.frame(read.table("~/EgyRef/2022.metabolic_elhadidi/analysis/plink/samples_names"
+                                 , header=FALSE, skip=0,sep = "\t"))
+#sorting the samples based on the first columns(names) by joining the 2 files from the 1000g website and the samples we had in our file
+samples <- join(samples_names,samples,by="V1")
+
+#Better looking Visualization with colors annotation 
+names(eigenvectors)[1] <- "PC1"
+names(eigenvectors)[2] <- "PC2"
+names(eigenvectors)[3] <- "PC3"
+
+tit = 'PCA genotypes'
+axx <- list(title="PC1 (41.11 %)")
+axy <- list(title="PC2 (20.34 %)")
+axz <- list(title="PC3 (7.72 %)" )
+
+fig <- plot_ly(eigenvectors,z= ~PC1,y= ~PC2 ,x=~PC3,color = samples$V2, colors = brewer.pal(n = 8, name = "Set1")) %>%
+  add_markers(size = 20)
+fig <- fig %>%
+  layout(
+    title = tit,
+    scene = list(bgcolor = "white",xaxis=axz,yaxis=axy,zaxis=axx)
+  )
+
+fig
+```
