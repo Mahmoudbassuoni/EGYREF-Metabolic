@@ -36,6 +36,16 @@ _To do so we have to join the 2 files [EGYREF_1000g_all_chr_positions] and [1000
 
 Here we Will be using a bash script like follows: 
 ```
+$ cd analysis
 $ nano script
-
+#! /bin/bash
+readarray -t pop < pop;
+readarray -t colnum < colnum; 
+for i in {0..4};
+do
+	awk -v j="${colnum[i]}" 'NR==FNR{a[$1,$2]=$3;next} ($1,$2) in a{print $1,$2,$5,$j,$3, a[$1,$2]}' EGYREF_1000g_all_chr_positions  1000_all_tab|
+		 sed "s|${pop[i]}_AF=||g" |awk '$4 !=0 {print}' > "${pop[i]}"_sub_SharedPositions_AF &&
+			sed 's/ /\t/g' "${pop[i]}"_sub_SharedPositions_AF|cut -f 1,2,3| sed 's/\t/_/g' > "${pop[i]}"_sub_SharedPositions;
+done
 ```
+_"pop" is a list that contains names of the subpopulations [EAS,AMR,AFR,EUR,SAS] each in a line. While "colnum" is another list with the same length that contains the column numbers where each subpopulation's AF exists [13,14,15,16,17] repectively._
