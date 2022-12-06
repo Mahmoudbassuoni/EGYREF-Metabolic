@@ -160,13 +160,13 @@ components <- data.frame(components)
 
 #Plotting the PCA in 2D brewer.pal(n = 8, name = "Set1")
 tit = 'PCA Populations total variations'
-fig <- plot_ly(components, x=components$PC1,y=components$PC2, color = pop$x, colors = rainbow(8) , name = pop$x) %>%
+fig <- plot_ly(components, x=components$PC1,y=components$PC2, color = pop$x, colors = brewer.pal(n = 8, name = "Set1")  , name = pop$x) %>%
     add_markers(size = 20)
 fig <- fig %>%
   layout(
     title = tit,
-    xaxis=list( title="PC 1"),
-    yaxis=list(title= "PC 2"),
+    xaxis=list( title="PC 1, (43.64 %)"),
+    yaxis=list(title= "PC 2,(37.8 %)"),
     scene = list(bgcolor = "#e5ecf6")
   )
 
