@@ -76,7 +76,7 @@ $ plink2 --bcf genes_all.bcf --vcf-idspace-to _ --const-fid --allow-extra-chr 0 
 **3- Variants Pruning with MAF=0.05 and indep-pairwise 50 5 0.5 and exclusion of the pruned varianted**
 ```
 $ mkdir pruned && cd pruned
-$ plink2 --bfile ../genes_all --maf 0.05 --indep-pairwise 50 5 0.5 --out genes_all; plink2 --bfile ../genes_all --extract pruned/genes_all.prune.in --make-bed --out pruned/genes_all
+$ plink2 --bfile ../genes_all --maf 0.05 --indep-pairwise 50 5 0.5 --out genes_all; plink2 --bfile ../genes_all --extract genes_all.prune.in --make-bed --out genes_all
 ```
 **4- extraction of the eigen values and eigen vectors of the PCA**
 ```
