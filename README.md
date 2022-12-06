@@ -142,7 +142,7 @@ library(plotly)
 library("RColorBrewer")
 #Load the main file AF
 joined_full <- data.frame(read.table("~/EgyRef/2022.metabolic_elhadidi/analysis/joined_full"
-                      , header=FALSE, skip=0,))
+                      , header=TRUE, skip=0,))
 #Convert the data frame to a matrix and clean the first 3 columns to retain only numbers  
 pop_mat <- as.matrix(joined_full[,-3][,-2][,-1])
 #Transpose the matrix
