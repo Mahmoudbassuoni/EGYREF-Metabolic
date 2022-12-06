@@ -107,19 +107,32 @@ library(plyr)
 joined <- join(x= all_tab_1000,y = all_tab_Egyref, by= c("V1"="V1","V2"="V2","V5"="V5"),type ="full",match="all")
 write.csv(joined,"~/EgyRef/2022.metabolic_elhadidi/analysis/joined")
 ```
-_(2) AFs [joined] is pruned for a heatmap to be drawn based on the existence of a value for that
-variant in the Egyptian population ensuring avoidance of dropping any Egyptian
-variant_ 
+_(2) AFs [joined] is pruned for a heatmap to be drawn based on the Threshold value for the AF, if it happened to be a value >= 0.05 in any population, 
+the variant is remained_ 
 
 ```
 $ cd ~/EgyRef/2022.metabolic_elhadidi/analysis
-$ sed 's/NA/0/g' joined| awk 'BEGIN{OFS="\t"} $24 !=0 {print}' | cut -f 2,3,6,14-18,24 | sed 's/EAS_AF=//g'| sed 's/AMR_AF=//g'|sed 's/EUR_AF=//g' | sed 's/AFR_AF=//g'| sed 's/SAS_AF=//g'|sed 's/AF=//g'> joined_full
+$ nano AF_prune
+#! /bin/bash
+readarray -t colnum < col ;
+
+sed 's/NA/0/g' joined| sed 's/EAS_AF=//g'| sed 's/AMR_AF=//g'|sed 's/EUR_AF=//g' | sed 's/AFR_AF=//g'| sed 's/SAS_AF=//g'|sed 's/AF=//g' > joined_temp
+for i in {0..5};
+do
+
+        awk -v j="${colnum[i]}" 'BEGIN{OFS="\t"} { if ($j >= 0.05) {print; next}}' joined_temp| cut -f 2,3,6,14-18,24 \
+                |sed '1i\Chr\tPosition\tALT_Allele\tEAS_AF\tAMR_AF\tAFR_AF\tEUR_AF\tSAS_AF\tEGYREF_AF' > joined_full
+done
+rm joined_temp
+$ bash AF_prune
 ```
 _(3) heatmap Visualization_
 ```
 All_var <- joined_full[,-3][,-2][,-1]
 matrix <- as.matrix(All_var)
-pheatmap::pheatmap(mat = matrix,scale = "column", cellheight = 0.02, cellwidth = 60 ,main = "Positions Allele Frequency" )
+pheatmap::pheatmap(mat = matrix,scale = "column", cellheight = 0.05, cellwidth = 60 ,main = "Common positions Allele Frequencies",
+                   labels_col =c("EAS","AMR","AFR","EUR","SAS","EGYREF"),angle_col = 315,
+                   fontsize_col= 13,cluster_cols= TRUE, cluster_rows= TRUE, color=colorRampPalette(c("navy", "white", "red"))(50) )
 ```
 _(4) calculation and visualization the AFs' PCA_
 
