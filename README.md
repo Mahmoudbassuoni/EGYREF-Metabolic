@@ -6,7 +6,7 @@ A workflow descriptive steps for the comparison of AFs and Genotypes among the E
 
 ```
 $ mkdir analysis
-$ cd EgyRef/2022.metabolic_elhadidi
+$ cd ~/EgyRef/2022.metabolic_elhadidi
 $ bcftools concat -D -o analysis/genes_1000_DEDUP -O z *_1000g.vcf.gz && bcftools norm -m-any -o analysis/genes_1000_DEDUP_biallelic.vcf.gz -O z analysis/genes_1000_DEDUP
 ```
 **2- EGYREF 16 genes files concatenation, Deduplication, and normalization to Biallelic**
