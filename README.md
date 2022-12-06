@@ -122,8 +122,8 @@ do
 
         awk -v j="${colnum[i]}" 'BEGIN{OFS="\t"} { if ($j >= 0.05) {print; next}}' joined_temp| cut -f 2,3,6,14-18,24 \
                 |sed '1i\Chr\tPosition\tALT_Allele\tEAS_AF\tAMR_AF\tAFR_AF\tEUR_AF\tSAS_AF\tEGYREF_AF' > joined_full
-done
-rm joined_temp
+done; rm joined_temp
+
 $ bash AF_prune
 ```
 _(3) heatmap Visualization_
