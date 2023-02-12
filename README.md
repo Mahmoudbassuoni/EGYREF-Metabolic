@@ -68,7 +68,7 @@ $ mkdir plink && cd plink
 ```
 **1- Merging all the samples in one BCF file with unified annotation**
 ```
-$ bcftools merge -0 -m all -o genes_all.vcf.gz -O z ../genes_1000_DEDUP_biallelic.vcf.gz ../genes_EGYREF_DEDUP_biallelic.vcf.gz
+$ bcftools index ../genes_1000_DEDUP_biallelic.vcf.gz && bcftools index ../genes_EGYREF_DEDUP_biallelic.vcf.gz && bcftools merge -0 -m all -o genes_all.vcf.gz -O z ../genes_1000_DEDUP_biallelic.vcf.gz ../genes_EGYREF_DEDUP_biallelic.vcf.gz
 $ bcftools norm -m-any genes_all.vcf.gz | bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' > genes_all.bcf; bcftools index genes_all.bcf
 ```
 **2- making the bed file required for the plink**
