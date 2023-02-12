@@ -13,7 +13,8 @@ $ bcftools concat -D -a -o analysis/genes_1000_DEDUP -O z */*_1000g.vcf.gz && bc
 ```
 **2- EGYREF 16 genes files concatenation, Deduplication, and normalization to Biallelic**
 ```
-$ bcftools concat -D -o analysis/genes_EGYREF_DEDUP -O z *_egyptians.vcf.gz && bcftools norm -m-any -o analysis/genes_EGYREF_DEDUP_biallelic.vcf.gz -O z analysis/genes_EGYREF_DEDUP
+$ for i in ${genes[@]}; do bcftools index ${i}/${i}_egyptians.vcf.gz; done
+$ bcftools concat -D -a -o analysis/genes_EGYREF_DEDUP -O z */*_egyptians.vcf.gz && bcftools norm -m-any -o analysis/genes_EGYREF_DEDUP_biallelic.vcf.gz -O z analysis/genes_EGYREF_DEDUP
 ```
 **3- Creation of the intermediate files needed for the extraction of the Allele frequenceies for each subpopulation variant in the 1000 genome**
 
