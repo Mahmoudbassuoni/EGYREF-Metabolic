@@ -85,6 +85,7 @@ $ plink2 --bfile ../genes_all --maf 0.05 --indep-pairwise 50 5 0.5 --out genes_a
 ```
 **4- extraction of the eigen values and eigen vectors of the PCA**
 ```
+mkdir PCA && cd PCA
 plink2 --bfile genes_all --pca
 ```
 # R analysis and visualization
