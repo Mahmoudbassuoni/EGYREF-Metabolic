@@ -45,6 +45,7 @@ $ nano script
 #! /bin/bash
 readarray -t pop < pop;
 readarray -t colnum < colnum; 
+sed -i 's/_/\t/g' EGYREF_1000g_all_chr_positions;
 for i in {0..4};
 do
 	awk -v j="${colnum[i]}" 'NR==FNR{a[$1,$2]=$3;next} ($1,$2) in a{print $1,$2,$5,$j,$3, a[$1,$2]}' EGYREF_1000g_all_chr_positions  1000_all_tab|
