@@ -75,8 +75,8 @@ $ bcftools norm -m-any genes_all.vcf.gz | bcftools annotate -Ob -x ID -I +'%CHRO
 
 _Here we're using plink v2_
 ```
-$ plink2 --bcf genes_all.bcf --make-pgen --sort-vars --out genes_all  --vcf-half-call r
-$ plink2 --bcf genes_all.bcf --vcf-idspace-to _ --const-fid --allow-extra-chr 0  --make-bed --out genes_all 
+$ plink2 --bcf genes_all.bcf --vcf-idspace-to _ --const-fid --allow-extra-chr 0 --make-pgen --sort-vars --out genes_all  --vcf-half-call r
+$ plink2 --pfile genes_all --make-bed --out genes_all 
 ```
 **3- Variants Pruning with MAF=0.05 and indep-pairwise 50 5 0.5 and exclusion of the pruned varianted**
 ```
