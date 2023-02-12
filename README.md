@@ -2,12 +2,14 @@
 A workflow descriptive pipline for the comparison of AFs and Genotypes among the Egyptian population genome database and the 1000 genome different subpopulations for the genes responsible for the 4 metabolic diseases [Diabetes,Obesity,Hypertension,hyperlipidemia].Total of 16 genes were found to be sharing variants of the 4 diseases [ALDH2, APOE, CDKAL1, FTO, HECTD4, LPL, MIR6761, OAS1, PDILT, POC5, PPARG, RNU6-680P, RPL7AP60, SLC39A8, TOMM40, UMOD].The aim for this project is to step on the genetic distance among the 1000 genome populations and the Egyptian one in those speicif diseases. Data for this project was obtained from [Wohlers, I., Künstner, A., Munz, M. et al. An integrated personal and population-based Egyptian genome reference. Nat Commun 11, 4719 (2020). https://doi.org/10.1038/s41467-020-17964-1].
 
 # Genes Data Pre-processing
-**1- 1000 genome 16 genes files concatenation, Deduplication, and normalization to Biallelic**
+**1- 1000 genome 16 genes files indexing, concatenation, Deduplication, and normalization to Biallelic**
 
 ```
 $ mkdir analysis
 $ cd ~/EgyRef/2022.metabolic_elhadidi
-$ bcftools concat -D -o analysis/genes_1000_DEDUP -O z *_1000g.vcf.gz && bcftools norm -m-any -o analysis/genes_1000_DEDUP_biallelic.vcf.gz -O z analysis/genes_1000_DEDUP
+$ readarray -t genes < genes
+$ for i in ${genes[@]}; do bcftools index ${i}/${i}_1000g.vcf.gz; done
+$ bcftools concat -D -a -o analysis/genes_1000_DEDUP -O z */*_1000g.vcf.gz && bcftools norm -m-any -o analysis/genes_1000_DEDUP_biallelic.vcf.gz -O z analysis/genes_1000_DEDUP
 ```
 **2- EGYREF 16 genes files concatenation, Deduplication, and normalization to Biallelic**
 ```
