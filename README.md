@@ -110,8 +110,8 @@ _(1) Join function in R “plyr” package was used on the 1000 and the Egyptian
 based on the chromosome, position, and alternative allele columns_
 ```
 library(plyr)
-joined <- join(x= all_tab_1000,y = all_tab_Egyref, by= c("V1"="V1","V2"="V2","V5"="V5"),type ="full",match="all")
-write.csv(joined,"~/EgyRef/2022.metabolic_elhadidi/analysis/joined")
+joined <- join(x= all_tab_1000,y = all_tab_Egyref, by= c("V1"="V1","V2"="V2","V5"="V5"),type ="left",match="all")
+write.table(joined,sep = "\t","~/EgyRef/2022.metabolic_elhadidi/analysis/joined")
 ```
 _(2) AFs [joined] is pruned for a heatmap to be drawn based on the Threshold value for the AF, if it happened to be a value >= 0.05 in any population, 
 the variant is remained_ 
@@ -121,7 +121,7 @@ $ cd ~/EgyRef/2022.metabolic_elhadidi/analysis
 $ nano AF_prune
 #! /bin/bash
 readarray -t colnum < col ;
-
+sed -i 's/"//g' joined;
 sed 's/NA/0/g' joined| sed 's/EAS_AF=//g'| sed 's/AMR_AF=//g'|sed 's/EUR_AF=//g' | sed 's/AFR_AF=//g'| sed 's/SAS_AF=//g'|sed 's/AF=//g' > joined_temp
 for i in {0..5};
 do
