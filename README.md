@@ -20,7 +20,7 @@ $ bcftools concat -D -a -o analysis/genes_EGYREF_DEDUP -O z */*_egyptians.vcf.gz
 
 _In this step we aim to create a tab separated subfile from the orginial VCF file to be used as a grep target for the next step_
 ```
- $ zcat analysis/genes_1000_DEDUP_biallelic.vcf.gz| awk ' BEGIN{FS=OFS="\t"} gsub (";","\t",$8)’ | cut -f 1-17 > analysis/1000_all_tab
+ $ zcat analysis/genes_1000_DEDUP_biallelic.vcf.gz| awk 'BEGIN{FS=OFS="\t"} gsub (";","\t",$8)' | cut -f 1-17 > analysis/1000_all_tab
 ```
 _Column 8 contains the info for the AFs of the individual subpopulations so we aim to change its separator to make each subpopulation in a separate columns and then cut all the needed information only_
 
