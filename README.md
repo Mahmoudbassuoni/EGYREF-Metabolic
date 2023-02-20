@@ -1,5 +1,5 @@
 # EGYREF-Diabetes 
-A workflow descriptive pipline for the comparison of AFs and Genotypes among the Egyptian population genome database and the 1000 genome different subpopulations for the genes responsible for the 4 metabolic diseases [Diabetes,Obesity,Hypertension,hyperlipidemia].Total of 16 genes were found to be sharing variants of the 4 diseases [ALDH2, APOE, CDKAL1, FTO, HECTD4, LPL, MIR6761, OAS1, PDILT, POC5, PPARG, RNU6-680P, RPL7AP60, SLC39A8, TOMM40, UMOD].The aim for this project is to step on the genetic distance among the 1000 genome populations and the Egyptian one in those speicif diseases. Data for this project was obtained from [Wohlers, I., Künstner, A., Munz, M. et al. An integrated personal and population-based Egyptian genome reference. Nat Commun 11, 4719 (2020). https://doi.org/10.1038/s41467-020-17964-1].
+A workflow descriptive pipline for the comparison of AFs and Genotypes among the Egyptian population genome database and the 1000 genome different subpopulations for the genes responsible for the 4 metabolic diseases [Diabetes,Obesity,Hypertension,hyperlipidemia].Total of 19 genes were found to be sharing variants of the 4 diseases [ALDH2, APOE, CDKAL1, FTO, GIPR, HECTD4, LPL, MIR642A, MIR642B, MIR6761, OAS1, PDILT, POC5, PPARG, RNU6-680P, RPL7AP60, SLC39A8, TOMM40, UMOD].The aim for this project is to step on the genetic distance among the 1000 genome populations and the Egyptian one in those speicif diseases. Data for this project was obtained from [Wohlers, I., Künstner, A., Munz, M. et al. An integrated personal and population-based Egyptian genome reference. Nat Commun 11, 4719 (2020). https://doi.org/10.1038/s41467-020-17964-1].
 
 # Genes Data Pre-processing
 **1- 1000 genome 16 genes files indexing, concatenation, Deduplication, and normalization to Biallelic**
@@ -69,7 +69,7 @@ awk 'BEGIN{FS=OFS="\t"} NR==FNR{a[$1,$2]=$3;next} ($1,$2) in a{print $1,$2,$5,$9
 # Populations genotype principal component analysis (PCA) extraction
 
 ```
-mkdir plink ; d plink
+mkdir plink ; cd plink
 ```
 **1- Samples sorting ,indexing, Annotating IDs and finally indexing the results for both EGYREF and 1000g**
 ```
