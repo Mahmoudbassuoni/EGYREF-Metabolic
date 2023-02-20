@@ -98,7 +98,7 @@ cat merged.vcf | cut -f 120-127 --complement| sed '1s/^/#/' > merged_complete.vc
 ```
 zcat ../genes_EGYREF_DEDUP_biallelic.vcf.gz | grep "##" > header; cat header merged_complete.vcf > temp; mv temp merged_complete.vcf
 ```
-**5- bcftools final sorting to start and indexing before going to the plink**
+**5- bcftools final sorting and indexing before going to the plink**
 ```
 bgzip merged_complete.vcf; tabix merged_complete.vcf.gz
 ```
