@@ -73,14 +73,14 @@ mkdir plink ; cd plink
 ```
 **1- Samples sorting ,indexing and finally Annotating the IDs both EGYREF and 1000g**
 ```
-bcftools sort ../genes_EGYREF_DEDUP_biallelic.vcf.gz -o genes_EGYREF_DEDUP_biallelic_sorted.vcf.gz -O z ;bcftools index genes_EGYREF_DEDUP_biallelic_sorted.vcf.gz ;bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' genes_EGYREF_DEDUP_biallelic_sorted.vcf.gz  > EGYREF.vcf
+bcftools sort ../genes_EGYREF_DEDUP_biallelic.vcf.gz -o genes_EGYREF_DEDUP_biallelic_sorted.vcf.gz -O z ;bcftools index genes_EGYREF_DEDUP_biallelic_sorted.vcf.gz ;bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' genes_EGYREF_DEDUP_biallelic_sorted.vcf.gz  -o EGYREF.vcf.gz -O z
 ```
 ```
-bcftools sort ../genes_1000_DEDUP_biallelic.vcf.gz -o genes_1000_DEDUP_biallelic_sorted.vcf.gz -O z ;bcftools index genes_1000_DEDUP_biallelic_sorted.vcf.gz ;bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' genes_1000_DEDUP_biallelic_sorted.vcf.gz > 1000g.vcf 
+bcftools sort ../genes_1000_DEDUP_biallelic.vcf.gz -o genes_1000_DEDUP_biallelic_sorted.vcf.gz -O z ;bcftools index genes_1000_DEDUP_biallelic_sorted.vcf.gz ;bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' genes_1000_DEDUP_biallelic_sorted.vcf.gz -o 1000g.vcf.gz -O z 
 ```
 **2- Files preparation for the merging process using R**
 ```
-zcat EGYREF.vcf.gz | sed '/^##/d' > EGY.tsv
+zcat EGYREF.vcf.gz | sed '/^##/d' > EGY.tsv; sed -i 's/chr//g' EGY.tsv
 ```
 ```
 zcat 1000g.vcf.gz | sed '/^##/d' > g1000.tsv
@@ -96,20 +96,20 @@ write.table(merged,quote = FALSE,row.names = FALSE,sep = "\t","~/EgyRef/2022.met
 cat merged.vcf | cut -f 120-127 --complement| sed '1s/^/#/' > merged_complete.vcf
 ```
 ```
-zcat ../genes_1000_DEDUP_biallelic.vcf.gz | grep "##" > header \
-; cat header merged_complete.vcf > temp \ 
-; mv temp merged_complete.vcf
+zcat ../genes_EGYREF_DEDUP_biallelic.vcf.gz | grep "##" > header; cat header merged_complete.vcf > temp; mv temp merged_complete.vcf
 ```
 **5- bcftools final sorting to start and indexing before going to the plink**
 ```
-bcftools sort merged_complete.vcf -o merged_complete.vcf.gz -O z \ 
-; bcftools index merged_complete.vcf.gz
+bgzip merged_complete.vcf; tabix merged_complete.vcf.gz
+```
+```
+bcftools sort merged_complete.vcf.gz -o merged_complete_sorted.vcf.gz -O z ; bcftools index merged_complete_sorted.vcf.gz
 ```
 **6- making the bed file required for the plink**
 
 _Here we're using plink v2_
 ```
-plink2 --vcf merged_complete.vcf.gz --vcf-idspace-to _ --const-fid --allow-extra-chr 0 --make-pgen --sort-vars --out genes_all  --vcf-half-call r
+plink2 --vcf merged_complete_sorted.vcf.gz --vcf-idspace-to _ --const-fid --allow-extra-chr 0 --make-pgen --sort-vars --out genes_all  --vcf-half-call r
 ```
 ```
 plink2 --pfile genes_all --make-bed --out genes_all 
