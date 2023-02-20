@@ -5,22 +5,24 @@ A workflow descriptive pipline for the comparison of AFs and Genotypes among the
 **1- 1000 genome 16 genes files indexing, concatenation, Deduplication, and normalization to Biallelic**
 
 ```
-$ mkdir analysis
-$ cd ~/EgyRef/2022.metabolic_elhadidi
-$ readarray -t genes < genes
-$ for i in ${genes[@]}; do bcftools index ${i}/${i}_1000g.vcf.gz; done
-$ bcftools concat -D -a -o analysis/genes_1000_DEDUP -O z */*_1000g.vcf.gz && bcftools norm -m-any -o analysis/genes_1000_DEDUP_biallelic.vcf.gz -O z analysis/genes_1000_DEDUP
+mkdir analysis
+```
+```
+cd ~/EgyRef/2022.metabolic_elhadidi \ 
+;readarray -t genes < genes \
+; for i in ${genes[@]}; do bcftools index ${i}/${i}_1000g.vcf.gz; done \ 
+;bcftools concat -D -a -o analysis/genes_1000_DEDUP -O z */*_1000g.vcf.gz && bcftools norm -m-any -o analysis/genes_1000_DEDUP_biallelic.vcf.gz -O z analysis/genes_1000_DEDUP
 ```
 **2- EGYREF 16 genes files concatenation, Deduplication, and normalization to Biallelic**
 ```
-$ for i in ${genes[@]}; do bcftools index ${i}/${i}_egyptians.vcf.gz; done
-$ bcftools concat -D -a -o analysis/genes_EGYREF_DEDUP -O z */*_egyptians.vcf.gz && bcftools norm -m-any -o analysis/genes_EGYREF_DEDUP_biallelic.vcf.gz -O z analysis/genes_EGYREF_DEDUP
+for i in ${genes[@]}; do bcftools index ${i}/${i}_egyptians.vcf.gz; done \
+; bcftools concat -D -a -o analysis/genes_EGYREF_DEDUP -O z */*_egyptians.vcf.gz && bcftools norm -m-any -o analysis/genes_EGYREF_DEDUP_biallelic.vcf.gz -O z analysis/genes_EGYREF_DEDUP
 ```
 **3- Creation of the intermediate files needed for the extraction of the Allele frequenceies for each subpopulation variant in the 1000 genome**
 
 _In this step we aim to create a tab separated subfile from the orginial VCF file to be used as a grep target for the next step_
 ```
- $ zcat analysis/genes_1000_DEDUP_biallelic.vcf.gz| awk 'BEGIN{FS=OFS="\t"} gsub (";","\t",$8)' | cut -f 1-17 > analysis/1000_all_tab
+zcat analysis/genes_1000_DEDUP_biallelic.vcf.gz| awk 'BEGIN{FS=OFS="\t"} gsub (";","\t",$8)' | cut -f 1-17 > analysis/1000_all_tab
 ```
 _Column 8 contains the info for the AFs of the individual subpopulations so we aim to change its separator to make each subpopulation in a separate columns and then cut all the needed information only_
 
@@ -32,7 +34,7 @@ _EGYREF VCF file chromosome field was normalized like the previous 1000g file by
 
 **6- creating a list that contains all the chr_position from the 2 concatenated VCF files to be used as the base of the joining process in the next step**
 ```
-$ (cat analysis/1000_all_tab | cut -f 1,2 | sed 's/\t/_/g' && cat analysis/EGYREF_all_tab | cut -f 1,2 | sed 's/\t/_/g')|sort | uniq > analysis/EGYREF_1000g_all_chr_positions  
+(cat analysis/1000_all_tab | cut -f 1,2 | sed 's/\t/_/g' && cat analysis/EGYREF_all_tab | cut -f 1,2 | sed 's/\t/_/g')|sort | uniq > analysis/EGYREF_1000g_all_chr_positions  
 ```
 **7- creation of the subpopulations' AFs files based on the existence of an AF value for such a chromosome_position in each subpopulation**
 
@@ -40,8 +42,10 @@ _To do so we have to join the 2 files [EGYREF_1000g_all_chr_positions] and [1000
 
 Here we Will be using a bash script like follows: 
 ```
-$ cd analysis
-$ nano script
+cd analysis ; \
+nano script
+```
+```
 #! /bin/bash
 readarray -t pop < pop;
 readarray -t colnum < colnum; 
@@ -52,8 +56,9 @@ do
 		 sed "s|${pop[i]}_AF=||g" |awk '$4 !=0 {print}' > "${pop[i]}"_sub_SharedPositions_AF &&
 			sed 's/ /\t/g' "${pop[i]}"_sub_SharedPositions_AF|cut -f 1,2,3| sed 's/\t/_/g' > "${pop[i]}"_sub_SharedPositions;
 done
-
-$ bash script
+```
+```
+bash script
 ```
 _"pop" is a list that contains names of the subpopulations [EAS,AMR,AFR,EUR,SAS] each in a line. While "colnum" is another list with the same length that contains the column numbers where each subpopulation's AF exists [13,14,15,16,17] repectively._
 
@@ -64,7 +69,7 @@ awk 'BEGIN{FS=OFS="\t"} NR==FNR{a[$1,$2]=$3;next} ($1,$2) in a{print $1,$2,$5,$9
 # Populations genotype principal component analysis (PCA) extraction
 
 ```
-$ mkdir plink && cd plink
+mkdir plink ; d plink
 ```
 **1- Samples sorting ,indexing, Annotating IDs and finally indexing the results for both EGYREF and 1000g**
 ```
@@ -81,10 +86,10 @@ bcftools sort ../genes_1000_DEDUP_biallelic.vcf.gz -o genes_1000_DEDUP_biallelic
 ```
 **2- Files preparation for the merging process using R**
 ```
-zcat plink/EGYREF.vcf.gz | sed '/^##/d' > EGY.tsv
+zcat EGYREF.vcf.gz | sed '/^##/d' > EGY.tsv
 ```
 ```
-zcat plink/1000g.vcf.gz | sed '/^##/d' > g1000.tsv
+zcat 1000g.vcf.gz | sed '/^##/d' > g1000.tsv
 ```
 **3- Joining the 2 files to get the common IDs with their samples genotypes in one file**
 ```
@@ -94,38 +99,39 @@ write.table(merged,quote = FALSE,row.names = FALSE,sep = "\t","~/EgyRef/2022.met
 ```
 **4- Clean the merge output from the extra columns and adjust the header for the bcftools to recognize it**
 ```
-cat plink/merged.vcf | cut -f 120-127 --complement| sed '1s/^/#/' > plink/merged_complete.vcf
+cat merged.vcf | cut -f 120-127 --complement| sed '1s/^/#/' > merged_complete.vcf
 ```
 ```
 zcat ../genes_1000_DEDUP_biallelic.vcf.gz | grep "##" > header \
-; cat header merged.vcf > temp \ 
-; mv temp merged.vcf
+; cat header merged_complete.vcf > temp \ 
+; mv temp merged_complete.vcf
 ```
 **5- bcftools final sorting to start and indexing before going to the plink**
 ```
-
+bcftools sort merged_complete.vcf -o merged_complete.vcf.gz -O z \ 
+; bcftools index merged_complete.vcf.gz
 ```
-
-**1- Merging all the samples in one BCF file with unified annotation**
-```
-$ bcftools index ../genes_1000_DEDUP_biallelic.vcf.gz && bcftools index ../genes_EGYREF_DEDUP_biallelic.vcf.gz && bcftools merge -0 -m all -o genes_all.vcf.gz -O z ../genes_1000_DEDUP_biallelic.vcf.gz ../genes_EGYREF_DEDUP_biallelic.vcf.gz
-$ bcftools norm -m-any genes_all.vcf.gz | bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' > genes_all.bcf; bcftools index genes_all.bcf
-```
-**2- making the bed file required for the plink**
+**6- making the bed file required for the plink**
 
 _Here we're using plink v2_
 ```
-$ plink2 --bcf genes_all.bcf --vcf-idspace-to _ --const-fid --allow-extra-chr 0 --make-pgen --sort-vars --out genes_all  --vcf-half-call r
-$ plink2 --pfile genes_all --make-bed --out genes_all 
+plink2 --vcf merged_complete.vcf.gz --vcf-idspace-to _ --const-fid --allow-extra-chr 0 --make-pgen --sort-vars --out genes_all  --vcf-half-call r
 ```
-**3- Variants Pruning with MAF=0.05 and indep-pairwise 50 5 0.5 and exclusion of the pruned varianted**
 ```
-$ mkdir pruned && cd pruned
-$ plink2 --bfile ../genes_all --maf 0.05 --indep-pairwise 50 5 0.5 --out genes_all; plink2 --bfile ../genes_all --extract genes_all.prune.in --make-bed --out genes_all
+plink2 --pfile genes_all --make-bed --out genes_all 
 ```
-**4- extraction of the eigen values and eigen vectors of the PCA**
+**7- Variants Pruning with MAF=0.05 and indep-pairwise 50 5 0.5 and exclusion of the pruned varianted**
+```
+mkdir pruned && cd pruned
+```
+```
+plink2 --bfile ../genes_all --maf 0.05 --indep-pairwise 50 5 0.5 --out genes_all; plink2 --bfile ../genes_all --extract genes_all.prune.in --make-bed --out genes_all
+```
+**8- extraction of the eigen values and eigen vectors of the PCA**
 ```
 mkdir PCA && cd PCA
+```
+```
 plink2 --bfile ../genes_all --pca
 ```
 # R analysis and visualization
@@ -157,8 +163,10 @@ _(2) AFs [joined] is pruned for a heatmap to be drawn based on the Threshold val
 the variant is remained_ 
 
 ```
-$ cd ~/EgyRef/2022.metabolic_elhadidi/analysis
-$ nano AF_prune
+cd ~/EgyRef/2022.metabolic_elhadidi/analysis ; \
+nano AF_prune
+```
+```
 #! /bin/bash
 readarray -t colnum < col ;
 sed -i 's/"//g' joined;
@@ -188,7 +196,7 @@ library(plotly)
 library("RColorBrewer")
 #Load the main file AF
 joined_full <- data.frame(read.table("~/EgyRef/2022.metabolic_elhadidi/analysis/joined_full"
-                      , header=TRUE, skip=0,))
+                                     , header=TRUE, skip=0,))
 #Convert the data frame to a matrix and clean the first 3 columns to retain only numbers  
 pop_mat <- as.matrix(joined_full[,-3][,-2][,-1])
 #Transpose the matrix
@@ -199,20 +207,24 @@ pop<- data.frame(x)
 #Calculate the PCA
 PCA <- prcomp(pop_mat_t,rank. = 3)
 #check the Cumlative proportions for each PC
-summary(PCA)
+PCA_Summary <- summary(PCA)
+PCA_importance <- PCA_Summary$importance
 #extract the PCA components
 components <- PCA[['x']]
 components <- data.frame(components)
-
+# PCs proportion of variances
+PC1_proportion <- PCA_importance[2,1]
+PC2_proportion <- PCA_importance[2,2]
+PC3_proportion <- PCA_importance[2,3]
 #Plotting the PCA in 2D brewer.pal(n = 8, name = "Set1")
 tit = 'PCA Populations total variations'
 fig <- plot_ly(components, x=components$PC1,y=components$PC2, color = pop$x, colors = brewer.pal(n = 8, name = "Set1")  , name = pop$x) %>%
-    add_markers(size = 20)
+  add_markers(size = 20)
 fig <- fig %>%
   layout(
     title = tit,
-    xaxis=list( title="PC 1, (43.64 %)"),
-    yaxis=list(title= "PC 2,(37.8 %)"),
+    xaxis=list(title=paste0("PC1 (", scales::percent(PC1_proportion),")")),
+    yaxis=list(title=paste0("PC2 (", scales::percent(PC2_proportion),")")),
     scene = list(bgcolor = "#e5ecf6")
   )
 
@@ -259,17 +271,22 @@ samples <- join(samples_names,samples,by="V1")
 names(eigenvectors)[1] <- "PC1"
 names(eigenvectors)[2] <- "PC2"
 names(eigenvectors)[3] <- "PC3"
-
+names(eigenvectors)[4] <- "PC4"
+names(eigenvectors)[5] <- "PC5"
+PC1_proportion <- round(proportionvariances[1,2])/100 
+PC2_proportion <- round(proportionvariances[2,2])/100 
+PC3_proportion <- round(proportionvariances[3,2])/100 
 tit = 'PCA genotypes'
-axx <- list(title="PC1 (41.11 %)")
-axy <- list(title="PC2 (20.34 %)")
+axx <- list(title=paste0("PC1 (", scales::percent(PC1_proportion),")"))
+axy <- list(title=paste0("PC2 (", scales::percent(PC2_proportion),")"))
+axz <- list(title=paste0("PC3 (", scales::percent(PC3_proportion),")"))
 
-fig <- plot_ly(eigenvectors,x= ~PC1,y= ~PC2 ,color = samples$V2, colors = brewer.pal(n = 8, name = "Set1")) %>%
+fig <- plot_ly(eigenvectors,x= ~PC1,y= ~PC2, z=~PC3 , color = samples_annotation$X.2, colors = brewer.pal(n = 8, name = "Set1")) %>%
   add_markers(size = 20)
 fig <- fig %>%
   layout(
     title = tit,
-    scene = list(bgcolor = "white",xaxis=axx,yaxis=axy)
+    scene = list(bgcolor = "white",xaxis=axz,yaxis=axy,zaxis=axx)
   )
 
 fig
