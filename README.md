@@ -71,7 +71,7 @@ awk 'BEGIN{FS=OFS="\t"} NR==FNR{a[$1,$2]=$3;next} ($1,$2) in a{print $1,$2,$5,$9
 ```
 mkdir plink ; cd plink
 ```
-**1- Samples sorting ,indexing, Annotating IDs and finally indexing the results for both EGYREF and 1000g**
+**1- Samples sorting ,indexing and finally Annotating the IDs both EGYREF and 1000g**
 ```
 bcftools sort ../genes_EGYREF_DEDUP_biallelic.vcf.gz -o genes_EGYREF_DEDUP_biallelic_sorted.vcf.gz -O z ;bcftools index genes_EGYREF_DEDUP_biallelic_sorted.vcf.gz ;bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' genes_EGYREF_DEDUP_biallelic_sorted.vcf.gz  > EGYREF.vcf
 ```
