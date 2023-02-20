@@ -66,6 +66,46 @@ awk 'BEGIN{FS=OFS="\t"} NR==FNR{a[$1,$2]=$3;next} ($1,$2) in a{print $1,$2,$5,$9
 ```
 $ mkdir plink && cd plink
 ```
+**1- Samples sorting ,indexing, Annotating IDs and finally indexing the results for both EGYREF and 1000g**
+```
+bcftools sort ../genes_EGYREF_DEDUP_biallelic.vcf.gz -o genes_EGYREF_DEDUP_biallelic_sorted.vcf.gz -O z \  
+;bcftools index genes_EGYREF_DEDUP_biallelic_sorted.vcf.gz \
+;bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' genes_EGYREF_DEDUP_biallelic_sorted.vcf.gz  > EGYREF.vcf.gz \
+;bcftools index EGYREF.vcf.gz
+```
+```
+bcftools sort ../genes_1000_DEDUP_biallelic.vcf.gz -o genes_1000_DEDUP_biallelic_sorted.vcf.gz -O z \
+;bcftools index genes_1000_DEDUP_biallelic_sorted.vcf.gz \
+;bcftools annotate -Ob -x ID -I +'%CHROM:%POS:%REF:%ALT' genes_1000_DEDUP_biallelic_sorted.vcf.gz -o 1000g.vcf.gz -O z \
+;bcftools index 1000g.vcf.gz
+```
+**2- Files preparation for the merging process using R**
+```
+zcat plink/EGYREF.vcf.gz | sed '/^##/d' > EGY.tsv
+```
+```
+zcat plink/1000g.vcf.gz | sed '/^##/d' > g1000.tsv
+```
+**3- Joining the 2 files to get the common IDs with their samples genotypes in one file**
+```
+library(plyr)
+merged <-join(x= EGY,y = g1000, by="ID",type ="inner",match="all")
+write.table(merged,quote = FALSE,row.names = FALSE,sep = "\t","~/EgyRef/2022.metabolic_elhadidi/analysis/plink/merged.vcf")
+```
+**4- Clean the merge output from the extra columns and adjust the header for the bcftools to recognize it**
+```
+cat plink/merged.vcf | cut -f 120-127 --complement| sed '1s/^/#/' > plink/merged_complete.vcf
+```
+```
+zcat ../genes_1000_DEDUP_biallelic.vcf.gz | grep "##" > header \
+; cat header merged.vcf > temp \ 
+; mv temp merged.vcf
+```
+**5- bcftools final sorting to start and indexing before going to the plink**
+```
+
+```
+
 **1- Merging all the samples in one BCF file with unified annotation**
 ```
 $ bcftools index ../genes_1000_DEDUP_biallelic.vcf.gz && bcftools index ../genes_EGYREF_DEDUP_biallelic.vcf.gz && bcftools merge -0 -m all -o genes_all.vcf.gz -O z ../genes_1000_DEDUP_biallelic.vcf.gz ../genes_EGYREF_DEDUP_biallelic.vcf.gz
