@@ -277,15 +277,18 @@ PC1_proportion <- round(proportionvariances[1,2])/100
 PC2_proportion <- round(proportionvariances[2,2])/100 
 PC3_proportion <- round(proportionvariances[3,2])/100 
 tit = 'PCA genotypes'
-axx <- list(title=paste0("PC1 (", scales::percent(PC1_proportion),")"))
-axy <- list(title=paste0("PC2 (", scales::percent(PC2_proportion),")"))
-axz <- list(title=paste0("PC3 (", scales::percent(PC3_proportion),")"))
+#axx <- list(title=paste0("PC1 (", scales::percent(PC1_proportion),")"))
+#axy <- list(title=paste0("PC2 (", scales::percent(PC2_proportion),")"))
+#axz <- list(title=paste0("PC3 (", scales::percent(PC3_proportion),")"))
 
-fig <- plot_ly(eigenvectors,x= ~PC1,y= ~PC2, z=~PC3 , color = samples_annotation$X.2, colors = brewer.pal(n = 8, name = "Set1")) %>%
+fig <- plot_ly(eigenvectors,x= ~PC1,y= ~PC2,z=~PC3, color = samples_annotation$X.2, colors = brewer.pal(n = 8, name = "Set1")) %>%
   add_markers(size = 20)
 fig <- fig %>%
   layout(
     title = tit,
+    xaxis=list(title=paste0("PC1 (", scales::percent(PC1_proportion),")")),
+    yaxis=list(title=paste0("PC2 (", scales::percent(PC2_proportion),")")),
+    zaxis=list(title=paste0("PC3 (", scales::percent(PC3_proportion),")")),
     scene = list(bgcolor = "white",xaxis=axz,yaxis=axy,zaxis=axx)
   )
 
