@@ -158,6 +158,7 @@ _(2) AFs [joined] table is Prepared for a heatmap to be drawn_
 ```
 cd ~/EgyRef/2022.metabolic_elhadidi/analysis
 ```
+```
 sed -i 's/"//g' joined; \
 sed 's/NA/0/g' joined| sed 's/EAS_AF=//g'| sed 's/AMR_AF=//g'|sed 's/EUR_AF=//g' | sed 's/AFR_AF=//g'| sed 's/SAS_AF=//g'|cut -f 2,3,6,14-18,24 |sed 's/AF=//g'|sed '1d' |sed '1i\Chr\tPosition\tALT_Allele\tEAS_AF\tAMR_AF\tAFR_AF\tEUR_AF\tSAS_AF\tEGYREF_AF' > joined_full
 ```
