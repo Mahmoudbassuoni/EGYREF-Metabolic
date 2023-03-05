@@ -162,6 +162,29 @@ cd ~/EgyRef/2022.metabolic_elhadidi/analysis
 sed -i 's/"//g' joined; \
 sed 's/NA/0/g' joined| sed 's/EAS_AF=//g'| sed 's/AMR_AF=//g'|sed 's/EUR_AF=//g' | sed 's/AFR_AF=//g'| sed 's/SAS_AF=//g'|cut -f 2,3,6,14-18,24 |sed 's/AF=//g'|sed '1d' |sed '1i\Chr\tPosition\tALT_Allele\tEAS_AF\tAMR_AF\tAFR_AF\tEUR_AF\tSAS_AF\tEGYREF_AF' > joined_full
 ```
+_Note: A possible pruning for the AFs based on the AF value if it happened to be large number of records that cannot fit the Heatmap would look like this_
+
+```
+cd ~/EgyRef/2022.metabolic_elhadidi/analysis ; \
+nano AF_prune
+```
+```
+#! /bin/bash
+readarray -t colnum < col ;
+sed -i 's/"//g' joined;
+sed 's/NA/0/g' joined| sed 's/EAS_AF=//g'| sed 's/AMR_AF=//g'|sed 's/EUR_AF=//g' | sed 's/AFR_AF=//g'| sed 's/SAS_AF=//g'|sed 's/AF=//g' > joined_temp
+for i in {0..5};
+do
+
+        awk -v j="${colnum[i]}" 'BEGIN{OFS="\t"} { if ($j >= 0.05) {print; next}}' joined_temp| cut -f 2,3,6,14-18,24 \
+                |sed '1i\Chr\tPosition\tALT_Allele\tEAS_AF\tAMR_AF\tAFR_AF\tEUR_AF\tSAS_AF\tEGYREF_AF' > joined_full
+done; rm joined_temp
+```
+```
+bash AF_prune
+``` 
+_here the record of the variant would be dropped our if it happened to be less than 0.05 in any population_
+
 _(3) heatmap Visualization_
 ```
 All_var <- joined_full[,-3][,-2][,-1]
