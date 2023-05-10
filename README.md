@@ -235,6 +235,27 @@ fig <- fig %>%
   )
 
 fig
+
+# Create a data frame with PC1, PC2, and pop$x columns
+df <- data.frame(PC1 = components$PC1, PC2 = components$PC2, Populations = pop$x)
+
+# Set the color palette
+color_palette <- brewer.pal(n = 8, name = "Set2")
+
+# Create the ggplot plot
+ggplot(df, aes(x = PC1, y = PC2, color = Populations)) +
+  geom_point(size = 4) +
+  labs(title = tit,
+       x = paste0("PC1 (", scales::percent(PC1_proportion), ")"),
+       y = paste0("PC2 (", scales::percent(PC2_proportion), ")")) +
+  scale_color_manual(values = color_palette) +
+  geom_vline(xintercept = 0, linetype = "solid", color = "black") +
+  geom_hline(yintercept = 0, linetype = "solid", color = "black") +
+  theme_linedraw() +  # Optional: Apply a classic theme to the plot
+  theme(
+  plot.title = element_text(hjust = 0.5, vjust = 0.5)
+)
+
 ```
 **3- Genotype PCA Visualization**
 
@@ -246,6 +267,7 @@ library(plotly)
 library(plyr)
 library(readxl)
 library(RColorBrewer)
+library(ggplot2)
 #Loading the EigenValues and EigenVectors
 eigenvectors <- data.frame(read.table("~/EgyRef/2022.metabolic_elhadidi/analysis/plink/pruned/plink2.eigenvec"
                                , header=FALSE, skip=0,))
