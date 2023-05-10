@@ -283,20 +283,60 @@ PC1_proportion <- round(proportionvariances[1,2])/100
 PC2_proportion <- round(proportionvariances[2,2])/100 
 PC3_proportion <- round(proportionvariances[3,2])/100 
 tit = 'PCA genotypes'
-#axx <- list(title=paste0("PC1 (", scales::percent(PC1_proportion),")"))
-#axy <- list(title=paste0("PC2 (", scales::percent(PC2_proportion),")"))
-#axz <- list(title=paste0("PC3 (", scales::percent(PC3_proportion),")"))
-
-fig <- plot_ly(eigenvectors,x= ~PC1,y= ~PC2,z=~PC3, color = samples_annotation$X.2, colors = brewer.pal(n = 8, name = "Set1")) %>%
-  add_markers(size = 20)
-fig <- fig %>%
+### 2D
+fig_2D <- plot_ly(eigenvectors,x= ~PC1,y= ~PC2, color = samples_annotation$V9, colors = brewer.pal(n = 8, name = "Set1")) %>%
+  add_trace(type = "scatter", mode = "markers", marker = list(size = 5))%>%
   layout(
     title = tit,
     xaxis=list(title=paste0("PC1 (", scales::percent(PC1_proportion),")")),
     yaxis=list(title=paste0("PC2 (", scales::percent(PC2_proportion),")")),
-    zaxis=list(title=paste0("PC3 (", scales::percent(PC3_proportion),")")),
-    scene = list(bgcolor = "white",xaxis=axz,yaxis=axy,zaxis=axx)
+    scene = list(bgcolor = "white"),
+    legend = list(itemclick = "toggleothers", itemsizing = "constant", itemwidth = 30, itemheight = 30)
+      ) %>%
+  config(toImageButtonOptions = list(
+    format = "svg",
+    filename = "GT_PCA_2d",
+    width = 930,
+    height = 540
+  )
+  )
+  
+
+### 3D
+axx <- list(title=paste0("PC1 (", scales::percent(PC1_proportion),")"))
+axy <- list(title=paste0("PC2 (", scales::percent(PC2_proportion),")"))
+axz <- list(title=paste0("PC3 (", scales::percent(PC3_proportion),")"))
+
+fig_3D <- plot_ly(eigenvectors,z= ~PC1,y= ~PC2,x=~PC3, color = samples_annotation$V9, colors = brewer.pal(n = 8, name = "Set1")) %>%
+    add_trace(type="scatter3d",mode = "markers", marker = list(size = 2))%>%
+  layout(
+    title = tit,
+    scene = list(bgcolor = "white",xaxis=axz,yaxis=axy,zaxis=axx),
+    legend = list(itemclick = "toggleothers", itemsizing = "constant", itemwidth = 30, itemheight = 30)
+  )%>%
+  config(toImageButtonOptions = list(
+    format = "svg",
+    filename = "GT_PCA_3d",
+    width = 948,
+    height = 600
+  )
   )
 
-fig
+
+# Create the ggplot
+df <- data.frame(PC1 = eigenvectors$PC1, PC2 = eigenvectors$PC2, PC3 = eigenvectors$PC3)
+
+ggplot_2D <- ggplot(df, aes(x = PC1, y = PC2, color = samples_annotation$V9)) +
+  geom_point(size = 1) +
+  labs(title = tit,
+       x = paste0("PC1 (", scales::percent(PC1_proportion), ")"),
+       y = paste0("PC2 (", scales::percent(PC2_proportion), ")") ) +
+    scale_color_manual(values = brewer.pal(n = 8, name = "Set1")) +
+  theme_minimal() +
+  theme(plot.background = element_rect(fill = "white"),
+        panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.ticks = element_blank(),
+        legend.position = "none")
+
 ```
