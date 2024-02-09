@@ -1,4 +1,4 @@
-# EGYREF-Diabetes 
+# GenoVis(Genomic Visualization and Insight System) 
 A workflow descriptive pipline for the comparison of AFs and Genotypes among the Egyptian population genome database and the 1000 genome different subpopulations for the genes responsible for the 4 metabolic diseases [Diabetes,Obesity,Hypertension,hyperlipidemia].Total of 19 genes were found to be sharing variants of the 4 diseases [ALDH2, APOE, CDKAL1, FTO, GIPR, HECTD4, LPL, MIR642A, MIR642B, MIR6761, OAS1, PDILT, POC5, PPARG, RNU6-680P, RPL7AP60, SLC39A8, TOMM40, UMOD].The aim for this project is to step on the genetic distance among the 1000 genome populations and the Egyptian one in those speicif diseases. Data for this project was obtained from [Wohlers, I., Künstner, A., Munz, M. et al. An integrated personal and population-based Egyptian genome reference. Nat Commun 11, 4719 (2020). https://doi.org/10.1038/s41467-020-17964-1].
 
 # Genes Data Pre-processing
